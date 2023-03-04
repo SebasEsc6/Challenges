@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import {AddCategory} from "./components/AddCategory"
 import {GifGrid} from './components/GifGrid'
-const categories = ['Perro', 'PIZZA']
+import { useCounter } from './hooks/useCounter.jsx'
 
  
 
-export const GifExpertApp = () =>{
+export const GiftExpertApp = () =>{
 
-    const [categories, setCategories] = useState(['']) 
+    const {counter, increment, decrement, reset} = useCounter(0);
+
+    const [categories, setCategories] = useState(['Comida']) 
 
     const onAddCategory= (category) => { 
     setCategories(list=> [...list, category])
@@ -15,7 +17,12 @@ export const GifExpertApp = () =>{
     
     return(
         <>
-         <h1>GitExpert</h1> 
+        <h1>Contador</h1>
+        <span>Llevo: {counter}</span><br></br>
+        <button onClick={() => increment() }> +1 </button>
+        <button onClick = {()=> decrement()}>-1</button>
+        <button onClick = {()=> reset()}>Reiniciar</button>
+         <h1>GiftExpert</h1> 
         <AddCategory onAddCategory ={onAddCategory}/>
         {
             categories.map(
@@ -30,6 +37,4 @@ export const GifExpertApp = () =>{
     )
 }
 
-
-
-export default GifExpertApp
+export default GiftExpertApp
