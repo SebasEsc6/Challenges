@@ -19,11 +19,11 @@ export const GiftExpertApp = () =>{
     return(
         <>
         <h1>Contador</h1>
-        <span>Llevo: {counter}</span><br></br>
+        <span>Van: {counter}</span><br></br>
         <button onClick={() => increment() }> +1 </button>
         <button onClick = {()=> decrement()}>-1</button>
         <button onClick = {()=> reset()}>Reiniciar</button>
-         <h1>GiftExpert</h1> 
+         <h1>GifExpert</h1> 
         <AddCategory onAddCategory ={onAddCategory}/>
         {
             categories.map(
