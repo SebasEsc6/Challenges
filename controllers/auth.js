@@ -1,29 +1,114 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const Usuario = require('../models/Usuario');
+const { trusted } = require('mongoose');
+const { generarJWT } = require('../helpers/jwt');
 
-
-const crearUsuario = (req, res = express.request ) => {
+const crearUsuario = async (req, res = express.request ) => {
     const { name, email, password } = req.body
 
-    res.status(200).json({
-        ok: true, 
-        name, email, password
-    })
+    try {
+
+        let usuario =  await Usuario.findOne({ email: email})
+        if (usuario){
+            return res.status(400).json({
+                ok: false,
+                msg: 'El usuario con este correo ya existe',
+            })
+
+        }
+
+
+        usuario  = new Usuario( req.body );
+        const salt = bcrypt.genSaltSync();
+        usuario.password = bcrypt.hashSync(password, salt);
+        await usuario.save();
+
+        res.status(200).json({
+            ok: true, 
+            name, email, password
+        })
+    } catch(error){
+        console.log( error )
+        res.status(500).json({
+            ok:false,
+            error,
+        })
+    }   
 }
 
-const loginUsuario = (req, res = express.request) => {
-    res.json({
-        ok: true
-    })
+const loginUsuario = async (req, res = express.request) => {
+    const { email, password} = req.body
+
+    try {
+        let usuario =  await Usuario.findOne({ email: email})
+        if (!usuario){
+            return res.status(400).json({
+                ok: false,
+                msg: 'El usuario NO existe',
+            })
+        }
+        const passwordValid = bcrypt.compareSync(password, usuario.password);
+        if (!passwordValid){
+            return res.status(400).json({
+                ok: false,
+                msg: 'El password NO es valido',
+            })
+        }
+
+        const token = await ( generarJWT(usuario.id, usuario.name))
+
+        res.status(200).json({
+            ok: true,
+            usuario,
+            token
+        })  
+
+    } catch(error){
+        console.log(error)
+        res.status(500).json({
+            ok: false,
+            error
+        })
+
+    }
+
 }
 
 const revalidarToken = (req, res = express.request) => {
+    const {uid, name} = req
+    const token = await (generarJWT(uid,name))
+
     res.json({
-        ok:true
+        ok: true,
+        token
     })
+
+
 }
+// const listarUsuarios = async (req, res = express.request) => {
+//     const usuarios = await Usuario.find().populate('tareas', 'title');
+
+//     try{
+//         res.status(200).json({
+//             ok:true,
+//             usuarios,
+//         })
+//     } catch(error){
+//         console.log(error)
+//         res.status(500).json({
+//             ok: false,
+//             msg: 'Internal error',
+
+//         })
+
+//     }
+
+// }
 
 module.exports = {
     loginUsuario,
     crearUsuario, 
-    revalidarToken
+    revalidarToken,
+    // listarUsuarios
 }
