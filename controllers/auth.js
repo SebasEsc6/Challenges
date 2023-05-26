@@ -1,12 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
-const { trusted } = require('mongoose');
 const { generarJWT } = require('../helpers/jwt');
 
 const crearUsuario = async (req, res = express.request ) => {
     const { name, email, password } = req.body
-
     try {
 
         let usuario =  await Usuario.findOne({ email: email})
@@ -17,8 +15,6 @@ const crearUsuario = async (req, res = express.request ) => {
             })
 
         }
-
-
         usuario  = new Usuario( req.body );
         const salt = bcrypt.genSaltSync();
         usuario.password = bcrypt.hashSync(password, salt);
@@ -55,7 +51,7 @@ const loginUsuario = async (req, res = express.request) => {
                 msg: 'El password NO es valido',
             })
         }
-
+        
         const token = await ( generarJWT(usuario.id, usuario.name))
 
         res.status(200).json({
@@ -86,29 +82,9 @@ const revalidarToken = (req, res = express.request) => {
 
 
 }
-// const listarUsuarios = async (req, res = express.request) => {
-//     const usuarios = await Usuario.find().populate('tareas', 'title');
-
-//     try{
-//         res.status(200).json({
-//             ok:true,
-//             usuarios,
-//         })
-//     } catch(error){
-//         console.log(error)
-//         res.status(500).json({
-//             ok: false,
-//             msg: 'Internal error',
-
-//         })
-
-//     }
-
-// }
 
 module.exports = {
     loginUsuario,
     crearUsuario, 
     revalidarToken,
-    // listarUsuarios
 }

@@ -9,7 +9,6 @@ const TaskScheme = Schema({
         type : Schema.Types.ObjectId,
         ref: 'Usuario'
     },
-
 },{
     toJSON: {
         virtuals: true

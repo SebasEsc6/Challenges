@@ -12,9 +12,9 @@ if (!token){
 }
 
 try{
-    const {uis,name} = jwt.verify(
+    const {uid,name} = jwt.verify(
         token,
-        process.env,SECRET_JWT_SEED
+        process.env.SECRET_JWT_SEED
     )   
     
     req.uid = uid
